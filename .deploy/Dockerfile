@@ -1,23 +1,33 @@
-# from https://github.com/maspio/n8n-puppeteer-docker/blob/main/Dockerfile
+
+# (step 1/15)
 FROM node:16-alpine
 
-ARG N8N_VERSION
+# Mettre la dernière version de N8N(step 2/15)
+ARG N8N_VERSION=0.198.2
 
+# Vérifie si il existe une version de N8N dans le fichier actuel(step 3/15)
 RUN if [ -z "$N8N_VERSION" ] ; then echo "The N8N_VERSION argument is missing!" ; exit 1; fi
 
-# Update everything and install needed dependencies
+# Mise à jour et installation de toute les dépendance nécessaires (step 4/15)
 RUN apk add --update graphicsmagick tzdata git tini su-exec
 
-# # Set a custom user to not have n8n run as root
+# # Mettre un autre nom que root (c'est un identifiant) (step 5/15)
 USER root
 
-# Install n8n and the also temporary all the packages
-# it needs to build it correctly.
-RUN apk --update add --virtual build-dependencies python3 build-base ca-certificates && \
-	npm config set python "$(which python3)" && \
-	npm_config_user=root npm install -g full-icu n8n@${N8N_VERSION} && \
-	apk del build-dependencies \
-	&& rm -rf /root /tmp/* /var/cache/apk/* && mkdir /root;
+# Installation de n8n et des package temporaires
+# C'est nécessaire pour que cela s'installe correctement. (step 6/15)
+ENV NODE_ENV=production
+RUN set -eux; \
+	apkArch="$(apk --print-arch)"; \
+	case "$apkArch" in \
+		'armv7') apk --no-cache add --virtual build-dependencies python3 build-base;; \
+	esac && \
+	npm install -g --omit=dev n8n@${N8N_VERSION} && \
+	case "$apkArch" in \
+		'armv7') apk del build-dependencies;; \
+	esac && \
+	find /usr/local/lib/node_modules/n8n -type f -name "*.ts" -o -name "*.js.map" -o -name "*.vue" | xargs rm && \
+	rm -rf /root/.npm
 
 # Installs latest Chromium (100) package.
 RUN apk add --no-cache \
