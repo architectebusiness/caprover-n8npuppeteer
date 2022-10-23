@@ -62,26 +62,26 @@ RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
     && chown -R pptruser:pptruser /home/pptruser \
     && chown -R pptruser:pptruser /app
 
-# Run everything after as non-privileged user. (step 13)
-USER pptruser
-
 # Install n8n-nodes-puppeteer
 # RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-puppeteer
 
-#step 14
+#step 13
 ENV NODE_ICU_DATA /usr/local/lib/node_modules/full-icu
 
-#step 15
+#step 14
 WORKDIR /data
 
-#step 16
+#step 15
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 
-#step 17
+#step 16
 RUN chmod +x /docker-entrypoint.sh
 
-#step 18
+#step 17
 ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
 
-#step 19
+#step 18
 EXPOSE 5678/tcp
+
+# Run everything after as non-privileged user. (step 19)
+USER pptruser
