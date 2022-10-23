@@ -41,32 +41,35 @@ RUN apk add --no-cache \
       nodejs \
       yarn
 
-# Tell Puppeteer to skip installing Chrome. We'll be using the installed package.(step 10)
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD 1
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-# Puppeteer v13.5.0 works with Chromium 100.(step 11)
-RUN yarn add puppeteer@13.5.0
-
-# Add user so we don't need --no-sandbox.(step 12)
-RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
-    && mkdir -p /home/pptruser/Downloads /app \
-    && chown -R pptruser:pptruser /home/pptruser \
-    && chown -R pptruser:pptruser /app
-
-# Install n8n-nodes-puppeteer
-# RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-puppeteer
-
-# Install fonts (step 8)
+# Install fonts
 RUN apk --no-cache add --virtual fonts msttcorefonts-installer fontconfig && \
 	update-ms-fonts && \
 	fc-cache -f && \
 	apk del fonts && \
 	find  /usr/share/fonts/truetype/msttcorefonts/ -type l -exec unlink {} \; \
 	&& rm -rf /root /tmp/* /var/cache/apk/* && mkdir /root
-	
-#step 13
+
 ENV NODE_ICU_DATA /usr/local/lib/node_modules/full-icu
+
+# Tell Puppeteer to skip installing Chrome. We'll be using the installed package.(step 10)
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true \
+	PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+RUN apk update && apk add --no-cache nmap && \
+    echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
+    echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
+    apk update && \
+    apk add --no-cache \
+      chromium \
+      harfbuzz \
+      "freetype>2.8" \
+      ttf-freefont \
+      nss
+
+# Install n8n-nodes-puppeteer
+# RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-puppeteer
+
 
 #step 14
 WORKDIR /data
