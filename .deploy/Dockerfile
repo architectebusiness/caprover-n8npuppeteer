@@ -37,6 +37,16 @@ RUN apk --no-cache add --virtual fonts msttcorefonts-installer fontconfig && \
 	find  /usr/share/fonts/truetype/msttcorefonts/ -type l -exec unlink {} \; \
 	&& rm -rf /root /tmp/* /var/cache/apk/* && mkdir /root
 	
+# Installs latest Chromium package.
+RUN apk upgrade --no-cache --available \
+    && apk add --no-cache \
+      chromium \
+      ttf-freefont \
+      font-noto-emoji \
+    && apk add --no-cache \
+      --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing \
+      font-wqy-zenhei
+	
 # Installs latest Chromium (100) package. (step 9)
 RUN apk add --no-cache \
       chromium \
@@ -53,16 +63,16 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Puppeteer v13.5.0 works with Chromium 100.(step 11)
-RUN yarn add puppeteer@13.5.0
+# RUN yarn add puppeteer@13.5.0
 
 # Add user so we don't need --no-sandbox.(step 12)
-RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
-    && mkdir -p /home/pptruser/Downloads /app \
-    && chown -R pptruser:pptruser /home/pptruser \
-    && chown -R pptruser:pptruser /app
+# RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
+#    && mkdir -p /home/pptruser/Downloads /app \
+#    && chown -R pptruser:pptruser /home/pptruser \
+#    && chown -R pptruser:pptruser /app
 
 # Run everything after as non-privileged user. (step 13)
-USER pptruser
+# USER pptruser
 
 # Install n8n-nodes-puppeteer
 # RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-puppeteer
@@ -77,7 +87,10 @@ WORKDIR /data
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 
 #step 17
-ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
+RUN chmod +x /docker-entrypoint.sh
 
 #step 18
+ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
+
+#step 19
 EXPOSE 5678/tcp
