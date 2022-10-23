@@ -60,22 +60,20 @@ USER pptruser
 # Install n8n-nodes-puppeteer
 # RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-puppeteer
 
-# Install fonts (step 13)
-RUN apk --no-cache add --virtual fonts msttcorefonts-installer fontconfig && \
-	update-ms-fonts && \
-	fc-cache -f && \
-	apk del fonts && \
-	find  /usr/share/fonts/truetype/msttcorefonts/ -type l -exec unlink {} \; \
-	&& rm -rf /root /tmp/* /var/cache/apk/* && mkdir /root
-
+#step 13
 ENV NODE_ICU_DATA /usr/local/lib/node_modules/full-icu
 
+#step 14
 WORKDIR /data
 
+#step 15
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 
+#step 16
 RUN chmod +x /docker-entrypoint.sh
 
+#step 17
 ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
 
+#step 18
 EXPOSE 5678/tcp
