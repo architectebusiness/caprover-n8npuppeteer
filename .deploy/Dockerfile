@@ -29,16 +29,8 @@ RUN set -eux; \
 	find /usr/local/lib/node_modules/n8n -type f -name "*.ts" -o -name "*.js.map" -o -name "*.vue" | xargs rm && \
 	rm -rf /root/.npm
 	
-# Install fonts (step 8)
-RUN apk --no-cache add --virtual fonts msttcorefonts-installer fontconfig && \
-	update-ms-fonts && \
-	fc-cache -f && \
-	apk del fonts && \
-	find  /usr/share/fonts/truetype/msttcorefonts/ -type l -exec unlink {} \; \
-	&& rm -rf /root /tmp/* /var/cache/apk/* && mkdir /root
-	
-	
-# Installs latest Chromium (100) package. (step 9)
+
+# Installs latest Chromium (100) package. (step 7)
 RUN apk add --no-cache \
       chromium \
       nss \
@@ -50,8 +42,8 @@ RUN apk add --no-cache \
       yarn
 
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed package.(step 10)
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD 1
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Puppeteer v13.5.0 works with Chromium 100.(step 11)
 RUN yarn add puppeteer@13.5.0
@@ -65,6 +57,14 @@ RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
 # Install n8n-nodes-puppeteer
 # RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-puppeteer
 
+# Install fonts (step 8)
+RUN apk --no-cache add --virtual fonts msttcorefonts-installer fontconfig && \
+	update-ms-fonts && \
+	fc-cache -f && \
+	apk del fonts && \
+	find  /usr/share/fonts/truetype/msttcorefonts/ -type l -exec unlink {} \; \
+	&& rm -rf /root /tmp/* /var/cache/apk/* && mkdir /root
+	
 #step 13
 ENV NODE_ICU_DATA /usr/local/lib/node_modules/full-icu
 
@@ -84,4 +84,4 @@ ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
 EXPOSE 5678/tcp
 
 # Run everything after as non-privileged user. (step 19)
-USER pptruser
+# USER pptruser
