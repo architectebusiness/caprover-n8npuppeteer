@@ -13,6 +13,7 @@ RUN npm install
 COPY --chown=chrome . ./
 ENTRYPOINT ["tini", "--"]
 CMD ["node", "/usr/src/app/src/pdf"]
+RUN -it -u="root"
 
 # Mettre la dernière version de N8N(step 2)
 ARG N8N_VERSION=0.198.2
