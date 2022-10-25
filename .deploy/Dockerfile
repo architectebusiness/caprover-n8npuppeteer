@@ -2,6 +2,18 @@
 # (step 1/15)
 FROM node:16-alpine
 
+#Install Chromium
+FROM zenika/alpine-chrome:with-node
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD 1
+ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium-browser
+WORKDIR /usr/src/app
+COPY --chown=chrome package.json package-lock.json ./
+RUN npm install
+COPY --chown=chrome . ./
+ENTRYPOINT ["tini", "--"]
+CMD ["node", "/usr/src/app/src/pdf"]
+
 # Mettre la dernière version de N8N(step 2)
 ARG N8N_VERSION=0.198.2
 
@@ -45,7 +57,7 @@ RUN apk --no-cache add --virtual fonts msttcorefonts-installer fontconfig && \
 ENV NODE_ICU_DATA /usr/local/lib/node_modules/full-icu
 
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed package.(step 10)
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true \
+# ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true \
 #	PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Installs latest Chromium (100) package. (step 7)
