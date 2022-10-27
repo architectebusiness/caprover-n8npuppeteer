@@ -3,7 +3,7 @@
 FROM node:16-alpine
 
 # Mettre la dernière version de N8N(step 2/15)
-ARG N8N_VERSION=0.198.2
+ARG N8N_VERSION=0.199.0
 
 # Vérifie si il existe une version de N8N dans le fichier actuel(step 3/15)
 RUN if [ -z "$N8N_VERSION" ] ; then echo "The N8N_VERSION argument is missing!" ; exit 1; fi
