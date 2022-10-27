@@ -1,15 +1,22 @@
+
+# (step 1/15)
 FROM node:16-alpine
 
-ARG N8N_VERSION=0.199.0
+# Mettre la dernière version de N8N(step 2/15)
+ARG N8N_VERSION=0.198.2
 
+# Vérifie si il existe une version de N8N dans le fichier actuel(step 3/15)
 RUN if [ -z "$N8N_VERSION" ] ; then echo "The N8N_VERSION argument is missing!" ; exit 1; fi
 
-# Update everything and install needed dependencies
+# Mise à jour et installation de toute les dépendance nécessaires (step 4/15)
 RUN apk add --update graphicsmagick tzdata git tini su-exec
 
-# # Set a custom user to not have n8n run as root
+# # Mettre un autre nom que root (c'est un identifiant) (step 5/15)
 USER root
 
+# Installation de n8n et des package temporaires
+# C'est nécessaire pour que cela s'installe correctement. (step 6/15)
+ENV NODE_ENV=production
 RUN set -eux; \
 	apkArch="$(apk --print-arch)"; \
 	case "$apkArch" in \
@@ -21,8 +28,6 @@ RUN set -eux; \
 	esac && \
 	find /usr/local/lib/node_modules/n8n -type f -name "*.ts" -o -name "*.js.map" -o -name "*.vue" | xargs rm && \
 	rm -rf /root/.npm
-
-
 
 # Installs latest Chromium (100) package.
 RUN apk add --no-cache \
