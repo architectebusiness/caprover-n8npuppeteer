@@ -1,23 +1,23 @@
-
-# (step 1/15)
+# from https://github.com/maspio/n8n-puppeteer-docker/blob/main/Dockerfile
 FROM node:16-alpine
 
-# Mettre la dernière version de N8N(step 2/15)
-ARG N8N_VERSION=0.193.5
+ARG N8N_VERSION
 
-# Vérifie si il existe une version de N8N dans le fichier actuel(step 3/15)
 RUN if [ -z "$N8N_VERSION" ] ; then echo "The N8N_VERSION argument is missing!" ; exit 1; fi
 
-# Mise à jour et installation de toute les dépendance nécessaires (step 4/15)
+# Update everything and install needed dependencies
 RUN apk add --update graphicsmagick tzdata git tini su-exec
 
-# # Mettre un autre nom que root (c'est un identifiant) (step 5/15)
+# # Set a custom user to not have n8n run as root
 USER root
 
-# Installation de n8n et des package temporaires
-# C'est nécessaire pour que cela s'installe correctement. (step 6/15)
-ENV NODE_ENV=production
-RUN npm install n8n -g
+# Install n8n and the also temporary all the packages
+# it needs to build it correctly.
+RUN apk --update add --virtual build-dependencies python3 build-base ca-certificates && \
+	npm config set python "$(which python3)" && \
+	npm_config_user=root npm install -g full-icu n8n@${N8N_VERSION} && \
+	apk del build-dependencies \
+	&& rm -rf /root /tmp/* /var/cache/apk/* && mkdir /root;
 
 # Installs latest Chromium (100) package.
 RUN apk add --no-cache \
@@ -29,11 +29,11 @@ RUN apk add --no-cache \
       yarn
 
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
-#ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true 
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Install n8n-nodes-puppeteer
-RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-puppeteer
+# RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-puppeteer
 
 # Install fonts
 RUN apk --no-cache add --virtual fonts msttcorefonts-installer fontconfig && \
