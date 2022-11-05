@@ -17,17 +17,7 @@ USER root
 # Installation de n8n et des package temporaires
 # C'est nécessaire pour que cela s'installe correctement. (step 6/15)
 ENV NODE_ENV=production
-RUN set -eux; \
-	apkArch="$(apk --print-arch)"; \
-	case "$apkArch" in \
-		'armv7') apk --no-cache add --virtual build-dependencies python3 build-base;; \
-	esac && \
-	npm install -g --omit=dev n8n@${N8N_VERSION} && \
-	case "$apkArch" in \
-		'armv7') apk del build-dependencies;; \
-	esac && \
-	find /usr/local/lib/node_modules/n8n -type f -name "*.ts" -o -name "*.js.map" -o -name "*.vue" | xargs rm && \
-	rm -rf /root/.npm
+RUN npm install n8n -g
 
 # Installs latest Chromium (100) package.
 RUN apk add --no-cache \
