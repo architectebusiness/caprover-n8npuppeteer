@@ -43,7 +43,7 @@ RUN apk add --no-cache \
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 # Install n8n-nodes-puppeteer
-# RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-puppeteer
+RUN cd /usr/local/lib/node_modules/n8n && npm install n8n-nodes-puppeteer
 
 # Install fonts
 RUN apk --no-cache add --virtual fonts msttcorefonts-installer fontconfig && \
