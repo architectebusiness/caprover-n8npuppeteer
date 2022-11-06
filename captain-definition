@@ -1,4 +1,39 @@
- {
-  "schemaVersion" :2 ,
-  "dockerfilePath" : "./Dockerfile"
- }
+{
+  "schemaVersion": 1,
+  "dockerfilePath" : "./Dockerfile",
+  "dockerfileLines": [
+    "version: \"3.7\"",
+    "networks:",
+    "  internal:",
+    "    external: false",
+    "    driver: bridge",
+    "services:",
+    "  n8n:",
+    "    container_name: n8n",
+    "    image: n8n-puppeteer",
+    "    # restart: unless-stopped",
+    "    build:",
+    "      dockerfile: ./Dockerfile",
+    "      context: .",
+    "      args:",
+    "        N8N_VERSION: ${N8N_VERSION:-0.193.5}",
+    "    environment:",
+    "      - N8N_PORT=5678",
+    "      - N8N_PROTOCOL=${N8N_PROTOCOL:-https}",
+    "      - NODE_ENV=production",
+    "      - GENERIC_TIMEZONE=Europe/Paris",
+    "      - EXECUTIONS_DATA_SAVE_ON_ERROR=all",
+    "      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=none",
+    "      - EXECUTIONS_DATA_SAVE_ON_PROGRESS=none",
+    "      - EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=none",
+    "    volumes:",
+    "      - ./.n8n:/home/node/.n8n",
+    "      # - ./n8n-nodes-puppeteer-extended:/home/n8n-nodes-puppeteer-extended # cd /home/node/.n8n/nodes && npm add file:../../../n8n-nodes-puppeteer-extended",
+    "    networks:",
+    "      - internal # 5678",
+    "    ports:",
+    "      - \"5678:5678\"",
+    "    privileged: true",
+    "    shm_size: 1gb"
+  ]
+}
