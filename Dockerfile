@@ -1,7 +1,7 @@
 # from https://github.com/maspio/n8n-puppeteer-docker/blob/main/Dockerfile
 FROM node:16-alpine
 
-ARG N8N_VERSION=0.193.5
+ARG N8N_VERSION=0.201.0
 
 RUN if [ -z "$N8N_VERSION" ] ; then echo "The N8N_VERSION argument is missing!" ; exit 1; fi
 
