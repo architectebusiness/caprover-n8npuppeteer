@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "dockerfileLines": [
-    "version: \"3.7\"",
+    "version: 3.7",
     "networks:",
     "  internal:",
     "    external: false",
