@@ -1,9 +1,8 @@
 version: "3.7"
 
 networks:
-  internal:
-    external: false
-    driver: bridge
+  captain-overlay-network:
+    external: true
 
 services:
   n8n:
@@ -14,13 +13,8 @@ services:
       dockerfile: ./Dockerfile
       context: .
       args:
-        N8N_VERSION: ${N8N_VERSION:-0.193.5}
+        N8N_VERSION: latest
     environment:
-      - N8N_HOST=${N8N_HOST:-mywebsite.com}
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=${N8N_PROTOCOL:-https}
-      - NODE_ENV=production
-      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-https://mywebsite.com/}
       - GENERIC_TIMEZONE=Europe/Paris
       - EXECUTIONS_DATA_SAVE_ON_ERROR=all
       - EXECUTIONS_DATA_SAVE_ON_SUCCESS=none
@@ -30,7 +24,7 @@ services:
       - ./.n8n:/home/node/.n8n
       # - ./n8n-nodes-puppeteer-extended:/home/n8n-nodes-puppeteer-extended # cd /home/node/.n8n/nodes && npm add file:../../../n8n-nodes-puppeteer-extended
     networks:
-      - internal # 5678
+      - captain-overlay-network
     ports:
       - "5678:5678"
     privileged: true
