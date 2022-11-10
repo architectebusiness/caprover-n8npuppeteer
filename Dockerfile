@@ -1,7 +1,7 @@
 # from https://github.com/maspio/n8n-puppeteer-docker/blob/main/Dockerfile
 FROM node:16-alpine
 
-ARG N8N_VERSION=0.201.0
+ARG N8N_VERSION=0.202.0
 
 RUN if [ -z "$N8N_VERSION" ] ; then echo "The N8N_VERSION argument is missing!" ; exit 1; fi
 
@@ -51,10 +51,8 @@ COPY docker-entrypoint.sh /docker-entrypoint.sh
 
 RUN chmod +x /docker-entrypoint.sh
 
-COPY run.sh /run.sh
-
-ENTRYPOINT ["sh","/run.sh"]
-
 ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
 
 EXPOSE 5678/tcp
+
+RUN --privileged --name n8n --shm-size 1gb n8n-puppeteer 
